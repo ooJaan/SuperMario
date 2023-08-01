@@ -115,11 +115,13 @@ function getCurTimeDifference(end, start){
     return time;
 }
 
-function setCookie(score){
-    var date = new Date();
-    var score = score;
-    document.cookie = date + "/" + score
-}
+function setCookie(score, outcome) {
+    const date = new Date() + 1;
+    document.cookie = `score=${score}; outcome=${outcome}; expires=${date}`;
+    //alert(document.cookie)
+    console.log(document.cookie)
+  }
+  
 
 
 const leaderboard = [1, 2, 3]
@@ -145,6 +147,9 @@ function animate() {
     deathboxes.forEach((deathbox) =>{
       deathbox.position.x -= 5;
     });
+    
+    newWin.position.x -= 5;
+    
   } else if (keys.left.pressed) {
     scrollOffset -= 5;
     platforms.forEach((platform) => {
@@ -153,6 +158,9 @@ function animate() {
     deathboxes.forEach((deathbox) =>{
       deathbox.position.x += 5;
     })
+    
+    newWin.position.x -= 5;
+      
   }
   console.log(scrollOffset);
 
@@ -167,11 +175,13 @@ function animate() {
       player.position.x <= newWin.position.x + newWin.width
     ) {
       player.velocity.y = 0;
-      location.reload()
-      const score = 100000;
-      //setCookie(score)
-
-      alert("You win! Your score: " + score)
+      
+      const playerScore = 1000000;
+        const outcome = "win";
+        //setCookie(playerScore, outcome);
+      //location.reload()
+      alert("You win! Your score: " + playerScore)
+     // setCookie(test, score)
 
     }
   platforms.forEach((platform) => {
