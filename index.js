@@ -53,17 +53,26 @@ class Platform {
     context.fillRect(this.position.x, this.position.y, this.width, this.height);
   }
 }
+class deathBox {
+    constructor(x, y, width, height) {
+      this.position = {
+        x: x,
+        y: y,
+      };
+      this.width = width;
+      this.height = height;
+    }
+  
+    draw() {
+      context.fillStyle = "red";
+      context.fillRect(this.position.x, this.position.y, this.width, this.height);
+    }
+  }
 
 const player = new Player();
-const platforms = [
-  new Platform(200, 800, 100, 20),
-  new Platform(400, 700, 100, 20),
-  new Platform(600, 600, 100, 20),
-  new Platform(800, 500, 100, 20),
-  new Platform(1000, 600, 100, 20),
-  new Platform(1200, 700, 100, 20),
-  new Platform(1400, 800, 100, 20),
-];
+const platform = new Platform(1200, 600, 1000000, 20);
+const deathbox = new deathBox(200, 700, 20, 20);
+
 
 const keys = {
   right: {
@@ -74,52 +83,40 @@ const keys = {
   },
 };
 
-let scrollOffset = 0;
-
 function animate() {
   requestAnimationFrame(animate);
   context.clearRect(0, 0, canvas.width, canvas.height);
   player.update();
-  platforms.forEach((platform) => {
-    platform.draw();
-  });
-
-  if (keys.right.pressed && player.position.x < 400) {
+  platform.draw();
+  deathbox.draw();
+  if (keys.right.pressed) {
     player.velocity.x = 5;
-  } else if (keys.left.pressed && player.position.x > 100) {
+  } else if (keys.left.pressed) {
     player.velocity.x = -5;
   } else {
     player.velocity.x = 0;
-
-    if (keys.right.pressed) {
-      scrollOffset += 5;
-      platforms.forEach((platform) => {
-        platform.position.x -= 5;
-      });
-    } else if (keys.left.pressed) {
-      scrollOffset -= 5;
-      platforms.forEach((platform) => {
-        platform.position.x += 5;
-      });
-    }
   }
 
-  console.log(scrollOffset);
-
   //detect platform collision
-  platforms.forEach((platform) => {
-    if (
-      player.position.y + player.height <= platform.position.y &&
-      player.position.y + player.height + player.velocity.y >=
-        platform.position.y &&
-      player.position.x + player.width >= platform.position.x &&
-      player.position.x <= platform.position.x + platform.width
-    ) {
-      player.velocity.y = 0;
-    }
-  });
-  if (scrollOffset > 3000) {
-    console.log("YOU WIN");
+  if (
+    player.position.y + player.height <= platform.position.y &&
+    player.position.y + player.height + player.velocity.y >=
+      platform.position.y &&
+    player.position.x + player.width >= platform.position.x &&
+    player.position.x <= platform.position.x + platform.width
+  ) {
+    player.velocity.y = 0;
+  }
+
+  if (
+    player.position.y + player.height <= deathbox.position.y &&
+    player.position.y + player.height + player.velocity.y >=
+      deathbox.position.y &&
+    player.position.x + player.width >= deathbox.position.x &&
+    player.position.x <= deathbox.position.x + deathbox.width
+  ) {
+    player.velocity.y = 0;
+    location.reload()
   }
 }
 animate();
