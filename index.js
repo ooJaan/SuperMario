@@ -55,26 +55,6 @@ class Platform {
 }
 
 const player = new Player();
-async function getMap(){
-  console.log("getting map");
-  const fileUrl = '/scripts/Map/01.json';
-  await fetch(fileUrl)
-  .then(response => {
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.text();
-  })
-  .then(textContent =>{
-    console.log(textContent);
-    var Map = JSON.parse(textContent);
-    console.log(Map);
-  })
-  console.log("got map");
-  var plats = Map["Platforms"];
-}
-getMap();
-console.log("tetsq");
 const platforms = [
 //  plats.forEach((plat) => {
 //    new Platform(plat[0], plat[1], plat[2], plat[3]);
