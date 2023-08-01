@@ -55,7 +55,15 @@ class Platform {
 }
 
 const player = new Player();
-const platform = new Platform(200, 800, 100, 20);
+const platforms = [
+  new Platform(200, 800, 100, 20),
+  new Platform(400, 700, 100, 20),
+  new Platform(600, 600, 100, 20),
+  new Platform(800, 500, 100, 20),
+  new Platform(1000, 600, 100, 20),
+  new Platform(1200, 700, 100, 20),
+  new Platform(1400, 800, 100, 20),
+];
 
 const keys = {
   right: {
@@ -66,29 +74,52 @@ const keys = {
   },
 };
 
+let scrollOffset = 0;
+
 function animate() {
   requestAnimationFrame(animate);
   context.clearRect(0, 0, canvas.width, canvas.height);
   player.update();
-  platform.draw();
+  platforms.forEach((platform) => {
+    platform.draw();
+  });
 
-  if (keys.right.pressed) {
+  if (keys.right.pressed && player.position.x < 400) {
     player.velocity.x = 5;
-  } else if (keys.left.pressed) {
+  } else if (keys.left.pressed && player.position.x > 100) {
     player.velocity.x = -5;
   } else {
     player.velocity.x = 0;
+
+    if (keys.right.pressed) {
+      scrollOffset += 5;
+      platforms.forEach((platform) => {
+        platform.position.x -= 5;
+      });
+    } else if (keys.left.pressed) {
+      scrollOffset -= 5;
+      platforms.forEach((platform) => {
+        platform.position.x += 5;
+      });
+    }
   }
 
+  console.log(scrollOffset);
+
   //detect platform collision
-  if (
-    player.position.y + player.height <= platform.position.y &&
-    player.position.y + player.height + player.velocity.y >=
-      platform.position.y &&
-    player.position.x + player.width >= platform.position.x &&
-    player.position.x <= platform.position.x + platform.width
-  ) {
-    player.velocity.y = 0;
+  platforms.forEach((platform) => {
+    if (
+      player.position.y + player.height <= platform.position.y &&
+      player.position.y + player.height + player.velocity.y >=
+        platform.position.y &&
+      player.position.x + player.width >= platform.position.x &&
+      player.position.x <= platform.position.x + platform.width
+    ) {
+      player.velocity.y = 0;
+    }
+  });
+  if (scrollOffset > 3000) {
+    console.log("YOU WIN");
   }
 }
 animate();
