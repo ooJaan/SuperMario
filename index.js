@@ -83,7 +83,14 @@ const keys = {
   },
 };
 
+function getCurTimeDifference(end, start){
+    const time = start.getTime() - end.getTime()
+    return time;
+}
+
+
 function animate() {
+ const timestart = new Date().getTime();
   requestAnimationFrame(animate);
   context.clearRect(0, 0, canvas.width, canvas.height);
   player.update();
@@ -117,6 +124,12 @@ function animate() {
   ) {
     player.velocity.y = 0;
     location.reload()
+    const score = player.position.x / 2
+    const endtime = new Date().getTime();
+    const TimeAlive = endtime - timestart;
+    alert("time Alive: " + TimeAlive +"Your Score: " + score)
+    alert("Your Score: " + score);
+    
   }
 }
 animate();
@@ -172,3 +185,5 @@ window.addEventListener("keyup", ({ key }) => {
       break;
   }
 });
+
+
