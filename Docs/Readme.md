@@ -1,0 +1,1 @@
+this folder is to be used with obsidian. 
