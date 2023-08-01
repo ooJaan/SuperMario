@@ -4,6 +4,8 @@ const popup = document.getElementById('popup');
 var gameover = false;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+var rightSideCollision = false;
+var leftSideCollision = false;
 let scrollOffset = 0;
 
 const gravity = 0.7;
@@ -93,7 +95,10 @@ const player = new Player();
 const platforms = [
   new Platform(0, 80, 500, 80),
   new Platform(700, 200, 75, 20),
-  new Platform(900, 350, 75, 20),
+  new Platform(1000, 350, 75, 20),
+  new Platform(1100, 80, 250, 80),
+  new Platform(1275, 250, 75, 20),
+  new Platform(1350, 400, 300, 400)
 ]
 const deathboxes = [
   new deathBox(500, 40, 600, 40)
@@ -130,40 +135,35 @@ function animate() {
   requestAnimationFrame(animate);
   context.clearRect(0, 0, canvas.width, canvas.height);
   player.update();
-  if (keys.right.pressed && player.position.x < 400) {
-    player.velocity.x = 5;
+  if (keys.right.pressed && player.position.x < 400 && !rightSideCollision) {
+    player.velocity.x = 4;
   }
-  else if (keys.left.pressed && player.position.x > 100) {
-    player.velocity.x = -5;
+  else if (keys.left.pressed && player.position.x > 100 && !leftSideCollision) {
+    player.velocity.x = -4;
   }
   else {
     player.velocity.x = 0;
   }
-  if (keys.right.pressed) {
-    scrollOffset += 5;
+  if (keys.right.pressed && !rightSideCollision) {
+    scrollOffset += 4;
     platforms.forEach((platform) => {
-      platform.position.x -= 5;
+      platform.position.x -= 4;
     });
     deathboxes.forEach((deathbox) =>{
-      deathbox.position.x -= 5;
+      deathbox.position.x -= 4;
     });
-    
-    newWin.position.x -= 5;
-    
-  } else if (keys.left.pressed) {
-    scrollOffset -= 5;
+  } else if (keys.left.pressed && !leftSideCollision) {
+    scrollOffset -= 4;
     platforms.forEach((platform) => {
-      platform.position.x += 5;
+      platform.position.x += 4;
     });
     deathboxes.forEach((deathbox) =>{
-      deathbox.position.x += 5;
+      deathbox.position.x += 4;
     })
     
     newWin.position.x -= 5;
       
   }
-  console.log(scrollOffset);
-
   //detect platform collision
   newWin.draw();
   
@@ -188,12 +188,32 @@ function animate() {
     platform.draw();
     if (
       player.position.y + player.height <= platform.position.y &&
-      player.position.y + player.height + player.velocity.y >=
-        platform.position.y &&
+      player.position.y + player.height + player.velocity.y >= platform.position.y &&
       player.position.x + player.width >= platform.position.x &&
       player.position.x <= platform.position.x + platform.width
     ) {
       player.velocity.y = 0;
+    }
+
+// Horizontal Collision Check  
+    if (
+      player.position.y + player.height >= platform.position.y &&     
+      player.position.y <= platform.position.y + platform.height
+    ){
+      if(player.position.x + player.width >= platform.position.x && player.position.x + player.width <= platform.position.x + player.velocity.x){
+        console.log("right side collision");
+        rightSideCollision = true;
+      }
+      else{
+        rightSideCollision = false;
+      }
+      if(player.position.x <= platform.position.x + platform.width && player.position.x >= platform.position.x + platform.width + player.velocity.x){
+        console.log("left side collision");
+        leftSideCollision = true;
+      }
+      else{
+        leftSideCollision = false
+      }
     }
   })
   deathboxes.forEach((deathbox) => {
