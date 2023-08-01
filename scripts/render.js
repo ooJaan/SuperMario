@@ -1,7 +1,6 @@
 const fileUrl = '/scripts/Map/01.txt';
 
 // Fetch the file content using the Fetch API
-game = document.getElementById("game");
 fetch(fileUrl)
   .then(response => {
     if (!response.ok) {
@@ -14,9 +13,17 @@ fetch(fileUrl)
     console.log(textContent);
     const MapSplit = textContent.split('\n');
     console.log(MapSplit.length);
+    var game = document.getElementById('game');
+    j = 0;
+    const map = [[], [], [], [], [], [], [], []];
     MapSplit.forEach((MapLine) => {
-        document.write(MapLine + '<br>');
+        game.innerHTML += MapLine + '<br>';
+        for(var i = 0; i <= MapLine.length; i++){
+            map[j][i] = MapLine.charAt(i);
+        }
+        j++;
     })
+    console.log(map);
   })
   .catch(error => {
     console.error('Error while fetching the file:', error);
