@@ -20,6 +20,14 @@
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
       z-index: 9999;
     }
+    .leaderboard {
+      display: block;
+      position: fixed;
+      top: 10%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #fff;
+    }
   </style>
 </head>
 <body>
@@ -32,6 +40,9 @@
     <p id="score"></p>
     <button onclick="(closePopup())">Restart Game</button>
   </div>
+
+  
+
   <script>
 function closePopup() {
     popup.style.display = 'none';

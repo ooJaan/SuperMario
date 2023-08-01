@@ -1,6 +1,7 @@
 const canvas = document.querySelector("canvas");
 const context = canvas.getContext("2d");
 const popup = document.getElementById('popup');
+var gameover = false;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 let scrollOffset = 0;
@@ -22,8 +23,10 @@ class Player {
   }
 
   draw() {
+    if(!gameover){
     context.fillStyle = "red";
     context.fillRect(this.position.x, this.position.y, this.width, this.height);
+    }
   }
 
   update() {
@@ -70,6 +73,22 @@ class deathBox {
     }
   }
 
+  class WinCondition {
+    constructor(x, y, width, height) {
+      this.position = {
+        x: x,
+        y: canvas.height - y,
+      };
+      this.width = width;
+      this.height = height;
+    }
+  
+    draw() {
+      context.fillStyle = "green";
+      context.fillRect(this.position.x, this.position.y, this.width, this.height);
+    }
+  }
+
 const player = new Player();
 const platforms = [
   new Platform(0, 80, 500, 80),
@@ -80,6 +99,7 @@ const deathboxes = [
   new deathBox(500, 40, 600, 40)
 
 ]
+const newWin = new WinCondition(505, 60, 60, 40)
 
 const keys = {
   right: {
@@ -95,7 +115,14 @@ function getCurTimeDifference(end, start){
     return time;
 }
 
+function setCookie(score){
+    var date = new Date();
+    var score = score;
+    document.cookie = date + "/" + score
+}
 
+
+const leaderboard = [1, 2, 3]
 function animate() {
   const timestart = new Date().getTime();
   requestAnimationFrame(animate);
@@ -130,6 +157,23 @@ function animate() {
   console.log(scrollOffset);
 
   //detect platform collision
+  newWin.draw();
+  
+    if (
+      player.position.y + player.height <= newWin.position.y &&
+      player.position.y + player.height + player.velocity.y >=
+        newWin.position.y &&
+      player.position.x + player.width >= newWin.position.x &&
+      player.position.x <= newWin.position.x + newWin.width
+    ) {
+      player.velocity.y = 0;
+      location.reload()
+      const score = 100000;
+      //setCookie(score)
+
+      alert("You win! Your score: " + score)
+
+    }
   platforms.forEach((platform) => {
     platform.draw();
     if (
@@ -156,14 +200,27 @@ function animate() {
       const score = player.position.x / 2
       const endtime = new Date().getTime();
       const TimeAlive = endtime - timestart;
-      //alert("time Alive: " + TimeAlive +" Your Score: " + score)
+      location.reload()
+      
+      alert("time Alive: " + TimeAlive +" Your Score: " + score)
+      gameOverNow();
       //alert("Your Score: " + score);
-      openPopup();
+      //openPopup();
       
     }
   })
 }
 animate();
+
+function gameOverNow(){
+    gameover = true;
+}
+function displayScore(){
+    const scoreElement = document.getElementById("score");
+    
+    score.textContent = `Constant Value: ${scoreElement}`;
+}
+displayScore();
 
 window.addEventListener("keydown", ({ key }) => {
   const lowercaseKey = key.toLowerCase();
