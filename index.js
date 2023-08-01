@@ -42,7 +42,7 @@ class Platform {
   constructor(x, y, width, height) {
     this.position = {
       x: x,
-      y: y,
+      y: canvas.height - y,
     };
     this.width = width;
     this.height = height;
@@ -57,7 +57,7 @@ class deathBox {
     constructor(x, y, width, height) {
       this.position = {
         x: x,
-        y: y,
+        y: canvas.height - y,
       };
       this.width = width;
       this.height = height;
@@ -70,9 +70,8 @@ class deathBox {
   }
 
 const player = new Player();
-const platform = new Platform(1200, 600, 1000000, 20);
-const deathbox = new deathBox(200, 700, 20, 20);
-
+const platform = new Platform(0, 80, 500, 80);
+const deathbox = new deathBox(500, 40, 300, 40);
 
 const keys = {
   right: {
