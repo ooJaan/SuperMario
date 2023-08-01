@@ -37,7 +37,25 @@ class Player {
   }
 }
 
+/////////////////////////PLATFORM//////////////////////////
+class Platform {
+  constructor(x, y, width, height) {
+    this.position = {
+      x: x,
+      y: y,
+    };
+    this.width = width;
+    this.height = height;
+  }
+
+  draw() {
+    context.fillStyle = "blue";
+    context.fillRect(this.position.x, this.position.y, this.width, this.height);
+  }
+}
+
 const player = new Player();
+const platform = new Platform(200, 800, 100, 20);
 
 const keys = {
   right: {
@@ -52,6 +70,7 @@ function animate() {
   requestAnimationFrame(animate);
   context.clearRect(0, 0, canvas.width, canvas.height);
   player.update();
+  platform.draw();
 
   if (keys.right.pressed) {
     player.velocity.x = 5;
@@ -59,6 +78,17 @@ function animate() {
     player.velocity.x = -5;
   } else {
     player.velocity.x = 0;
+  }
+
+  //detect platform collision
+  if (
+    player.position.y + player.height <= platform.position.y &&
+    player.position.y + player.height + player.velocity.y >=
+      platform.position.y &&
+    player.position.x + player.width >= platform.position.x &&
+    player.position.x <= platform.position.x + platform.width
+  ) {
+    player.velocity.y = 0;
   }
 }
 animate();
