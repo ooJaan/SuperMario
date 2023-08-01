@@ -71,10 +71,10 @@ class deathBox {
 
 const player = new Player();
 const platforms = [
-  new Platform(0, 80, 500, 80),
+  new Platform(0, 80, 500, 80)
 ]
 const deathboxes = [
-  new deathBox(500, 40, 300, 40),
+  new deathBox(500, 40, 300, 40)
 
 ]
 
@@ -98,8 +98,6 @@ function animate() {
   requestAnimationFrame(animate);
   context.clearRect(0, 0, canvas.width, canvas.height);
   player.update();
-  platform.draw();
-  deathbox.draw();
   if (keys.right.pressed) {
     player.velocity.x = 5;
   } else if (keys.left.pressed) {
@@ -109,33 +107,38 @@ function animate() {
   }
 
   //detect platform collision
-  if (
-    player.position.y + player.height <= platform.position.y &&
-    player.position.y + player.height + player.velocity.y >=
-      platform.position.y &&
-    player.position.x + player.width >= platform.position.x &&
-    player.position.x <= platform.position.x + platform.width
-  ) {
-    player.velocity.y = 0;
-  }
-
-  if (
-    player.position.y + player.height <= deathbox.position.y &&
-    player.position.y + player.height + player.velocity.y >=
-      deathbox.position.y &&
-    player.position.x + player.width >= deathbox.position.x &&
-    player.position.x <= deathbox.position.x + deathbox.width
-  ) {
-    player.velocity.y = 0;
-    //location.reload()
-    const score = player.position.x / 2
-    const endtime = new Date().getTime();
-    const TimeAlive = endtime - timestart;
-    //alert("time Alive: " + TimeAlive +" Your Score: " + score)
-    //alert("Your Score: " + score);
-    openPopup();
-    
-  }
+  platforms.forEach((platform) => {
+    platform.draw();
+    if (
+      player.position.y + player.height <= platform.position.y &&
+      player.position.y + player.height + player.velocity.y >=
+        platform.position.y &&
+      player.position.x + player.width >= platform.position.x &&
+      player.position.x <= platform.position.x + platform.width
+    ) {
+      player.velocity.y = 0;
+    }
+  })
+  deathboxes.forEach((deathbox) => {
+    deathbox.draw();
+    if (
+      player.position.y + player.height <= deathbox.position.y &&
+      player.position.y + player.height + player.velocity.y >=
+        deathbox.position.y &&
+      player.position.x + player.width >= deathbox.position.x &&
+      player.position.x <= deathbox.position.x + deathbox.width
+    ) {
+      player.velocity.y = 0;
+      //location.reload()
+      const score = player.position.x / 2
+      const endtime = new Date().getTime();
+      const TimeAlive = endtime - timestart;
+      //alert("time Alive: " + TimeAlive +" Your Score: " + score)
+      //alert("Your Score: " + score);
+      openPopup();
+      
+    }
+  })
 }
 animate();
 
