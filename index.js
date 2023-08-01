@@ -3,6 +3,7 @@ const context = canvas.getContext("2d");
 const popup = document.getElementById('popup');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+let scrollOffset = 0;
 
 const gravity = 0.7;
 
@@ -71,10 +72,12 @@ class deathBox {
 
 const player = new Player();
 const platforms = [
-  new Platform(0, 80, 500, 80)
+  new Platform(0, 80, 500, 80),
+  new Platform(700, 200, 75, 20),
+  new Platform(900, 350, 75, 20),
 ]
 const deathboxes = [
-  new deathBox(500, 40, 300, 40)
+  new deathBox(500, 40, 600, 40)
 
 ]
 
@@ -94,17 +97,37 @@ function getCurTimeDifference(end, start){
 
 
 function animate() {
- const timestart = new Date().getTime();
+  const timestart = new Date().getTime();
   requestAnimationFrame(animate);
   context.clearRect(0, 0, canvas.width, canvas.height);
   player.update();
-  if (keys.right.pressed) {
+  if (keys.right.pressed && player.position.x < 400) {
     player.velocity.x = 5;
-  } else if (keys.left.pressed) {
+  }
+  else if (keys.left.pressed && player.position.x > 100) {
     player.velocity.x = -5;
-  } else {
+  }
+  else {
     player.velocity.x = 0;
   }
+  if (keys.right.pressed) {
+    scrollOffset += 5;
+    platforms.forEach((platform) => {
+      platform.position.x -= 5;
+    });
+    deathboxes.forEach((deathbox) =>{
+      deathbox.position.x -= 5;
+    });
+  } else if (keys.left.pressed) {
+    scrollOffset -= 5;
+    platforms.forEach((platform) => {
+      platform.position.x += 5;
+    });
+    deathboxes.forEach((deathbox) =>{
+      deathbox.position.x += 5;
+    })
+  }
+  console.log(scrollOffset);
 
   //detect platform collision
   platforms.forEach((platform) => {
