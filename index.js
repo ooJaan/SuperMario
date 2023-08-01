@@ -6,6 +6,13 @@ canvas.height = window.innerHeight;
 
 const gravity = 0.7;
 
+/////////////////////images////////////////////////
+const ground = document.createElement("img");
+ground.src = "img/desert_ground.png";
+
+console.log(ground);
+///////////////////////////////////////////////////
+
 class Player {
   constructor() {
     this.position = {
@@ -39,31 +46,33 @@ class Player {
 
 /////////////////////////PLATFORM//////////////////////////
 class Platform {
-  constructor(x, y, width, height) {
+  constructor(x, y, image) {
     this.position = {
       x: x,
       y: y,
     };
-    this.width = width;
-    this.height = height;
+    this.image = image;
+    this.width = 200; // Initially set to 0
+    this.height = 0; // Initially set to 0
+
+    // Add onload event to set the dimensions once the image is loaded
+    this.image.onload = () => {
+      this.width = this.image.width;
+      this.height = this.image.height;
+    };
   }
 
   draw() {
-    context.fillStyle = "blue";
-    context.fillRect(this.position.x, this.position.y, this.width, this.height);
+    context.drawImage(this.image, this.position.x, this.position.y);
   }
 }
 
 const player = new Player();
-const platforms = [
-  new Platform(200, 800, 100, 20),
-  new Platform(400, 700, 100, 20),
-  new Platform(600, 600, 100, 20),
-  new Platform(800, 500, 100, 20),
-  new Platform(1000, 600, 100, 20),
-  new Platform(1200, 700, 100, 20),
-  new Platform(1400, 800, 100, 20),
-];
+const platforms = [];
+const platform = new Platform(600, 1070, ground);
+platforms.push(platform);
+
+const groundPlatforms = [];
 
 const keys = {
   right: {
@@ -107,21 +116,27 @@ function animate() {
   console.log(scrollOffset);
 
   //detect platform collision
+  // Detect platform collision
   platforms.forEach((platform) => {
     if (
-      player.position.y + player.height <= platform.position.y &&
       player.position.y + player.height + player.velocity.y >=
         platform.position.y &&
+      player.position.y + player.velocity.y <=
+        platform.position.y + platform.height &&
       player.position.x + player.width >= platform.position.x &&
-      player.position.x <= platform.position.x + platform.width
+      player.position.x <= platform.position.x + platform.width &&
+      player.velocity.y > 0
     ) {
       player.velocity.y = 0;
+      player.position.y = platform.position.y - player.height; // Reset player position to be on top of the platform
     }
   });
+
   if (scrollOffset > 3000) {
     console.log("YOU WIN");
   }
 }
+renderGround(20);
 animate();
 
 window.addEventListener("keydown", ({ key }) => {
@@ -175,3 +190,11 @@ window.addEventListener("keyup", ({ key }) => {
       break;
   }
 });
+
+function renderGround(num) {
+  let count = 0;
+  for (let i = 0; i < num; i++) {
+    platforms.push(new Platform(count, 1110, ground));
+    count += 200;
+  }
+}
