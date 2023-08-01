@@ -7,10 +7,42 @@ canvas.height = window.innerHeight;
 const gravity = 0.7;
 
 /////////////////////images////////////////////////
+function createImage(imageSrc) {
+  const image = new Image();
+  image.src = imageSrc;
+  return image;
+}
+
 const ground = document.createElement("img");
 ground.src = "img/desert_ground.png";
 
-console.log(ground);
+const background = document.createElement("img");
+background.src = "img/background.jpg";
+
+//////////////////character sprites////////////////////
+const runRight = document.createElement("img");
+runRight.src = "img/RunRight.png";
+const jumpRight = document.createElement("img");
+jumpRight.src = "img/JumpRight.png";
+
+const jumpLeft = document.createElement("img");
+jumpLeft.src = "img/JumpLeft.png";
+const runLeft = document.createElement("img");
+runLeft.src = "img/RunLeft.png";
+
+class GenericObject {
+  constructor(x, y, width, height, image) {
+    this.position = {
+      x: -1,
+      y: -1,
+    };
+    this.width = width;
+    this.height = height;
+    this.image = image;
+  }
+}
+
+const genericObjects = [new GenericObject(0, 0, 0, 0, background)];
 ///////////////////////////////////////////////////
 
 class Player {
@@ -23,16 +55,28 @@ class Player {
       x: 0,
       y: 0,
     };
-    this.width = 30;
-    this.height = 30;
+    this.width = 50;
+    this.height = 100;
+
+    this.image = createImage("img/RunRight.png");
   }
 
   draw() {
-    context.fillStyle = "red";
-    context.fillRect(this.position.x, this.position.y, this.width, this.height);
+    context.drawImage(
+      this.image,
+      0,
+      0,
+      70,
+      400,
+      this.position.x,
+      this.position.y,
+      100,
+      400
+    );
   }
 
   update() {
+    this.frames++;
     this.draw();
     this.position.x += this.velocity.x;
     this.position.y += this.velocity.y;
@@ -88,7 +132,11 @@ let scrollOffset = 0;
 function animate() {
   requestAnimationFrame(animate);
   context.clearRect(0, 0, canvas.width, canvas.height);
+  genericObjects.forEach((object) => {
+    context.drawImage(object.image, 0, 0);
+  });
   player.update();
+
   platforms.forEach((platform) => {
     platform.draw();
   });
@@ -135,6 +183,13 @@ function animate() {
   if (scrollOffset > 3000) {
     console.log("YOU WIN");
   }
+  if (player.velocity.y === 0) {
+    if (player.image === jumpRight) {
+      player.image = runRight;
+    } else if (player.image === jumpLeft) {
+      player.image = runLeft;
+    }
+  }
 }
 renderGround(20);
 animate();
@@ -146,11 +201,17 @@ window.addEventListener("keydown", ({ key }) => {
     // W - JUMP
     case "w":
       console.log("jump");
+      if (player.image === runRight) {
+        player.image = jumpRight;
+      } else {
+        player.image = jumpLeft;
+      }
       player.velocity.y -= 20;
       break;
     // A - LEFT
     case "a":
       console.log("left");
+      player.image = runLeft;
       keys.left.pressed = true;
       break;
     // S - DOWN
@@ -160,6 +221,7 @@ window.addEventListener("keydown", ({ key }) => {
     // D - RIGHT
     case "d":
       console.log("right");
+      player.image = runRight;
       keys.right.pressed = true;
       break;
   }
