@@ -70,8 +70,13 @@ class deathBox {
   }
 
 const player = new Player();
-const platform = new Platform(0, 80, 500, 80);
-const deathbox = new deathBox(500, 40, 300, 40);
+const platforms = [
+  new Platform(0, 80, 500, 80),
+]
+const deathboxes = [
+  new deathBox(500, 40, 300, 40),
+
+]
 
 const keys = {
   right: {
