@@ -1,12 +1,45 @@
-<canvas></canvas>
-<script src="index.js"></script>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Super Block</title>
+  <style>
+    /* Styles for the canvas and the popup container */
+    canvas {
+      border: 1px solid #000;
+      background-color: black;
+    }
+    .popup-container {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #fff;
+      padding: 20px;
+      border: 1px solid #ccc;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+  <canvas></canvas> <!-- The canvas element for the game graphics -->
 
-<style>
-  body {
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    background-color: black;
+  <!-- The popup container -->
+  <div class="popup-container" id="popup">
+    <h2>Game Over</h2>
+    <p id="timeAlive"></p>
+    <p id="score"></p>
+    <button onclick="(closePopup())">Restart Game</button>
+  </div>
+  <script>
+function closePopup() {
+    popup.style.display = 'none';
+    event.preventDefault();
+    location.reload();
   }
-</style>
-
+  </script>
+  
+  <script src="index.js"></script> <!-- Link to the JavaScript file -->
+</body>
+</html>

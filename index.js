@@ -1,6 +1,6 @@
 const canvas = document.querySelector("canvas");
 const context = canvas.getContext("2d");
-
+const popup = document.getElementById('popup');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
@@ -122,12 +122,13 @@ function animate() {
     player.position.x <= deathbox.position.x + deathbox.width
   ) {
     player.velocity.y = 0;
-    location.reload()
+    //location.reload()
     const score = player.position.x / 2
     const endtime = new Date().getTime();
     const TimeAlive = endtime - timestart;
-    alert("time Alive: " + TimeAlive +"Your Score: " + score)
-    alert("Your Score: " + score);
+    //alert("time Alive: " + TimeAlive +" Your Score: " + score)
+    //alert("Your Score: " + score);
+    openPopup();
     
   }
 }
@@ -184,5 +185,16 @@ window.addEventListener("keyup", ({ key }) => {
       break;
   }
 });
+
+
+function openPopup() {
+    popup.style.display = 'block';
+  }
+  
+  function closePopup() {
+    popup.style.display = 'none';
+    event.preventDefault();
+    location.reload();
+  }
 
 
