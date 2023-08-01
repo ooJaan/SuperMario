@@ -1,8 +1,10 @@
 const canvas = document.querySelector("canvas");
 const context = canvas.getContext("2d");
-
+const popup = document.getElementById("popup");
+var gameover = false;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+let scrollOffset = 0;
 
 const gravity = 0.7;
 
@@ -76,7 +78,6 @@ class Player {
   }
 
   update() {
-    this.frames++;
     this.draw();
     this.position.x += this.velocity.x;
     this.position.y += this.velocity.y;
@@ -126,8 +127,6 @@ const keys = {
     pressed: false,
   },
 };
-
-let scrollOffset = 0;
 
 function animate() {
   requestAnimationFrame(animate);
