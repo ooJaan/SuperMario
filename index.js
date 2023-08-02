@@ -153,8 +153,8 @@ class Platform {
       x: x,
       y: canvas.height - y,
     };
-    this.width = width; 
-    this.height = height; 
+    this.width = width;
+    this.height = height;
   }
 
   draw() {
@@ -173,7 +173,7 @@ class deathBox {
   }
 
   draw() {
-    context.fillStyle = "red";
+    context.fillStyle = "transparent";
     context.fillRect(this.position.x, this.position.y, this.width, this.height);
   }
 }
@@ -197,16 +197,16 @@ class WinCondition {
 const player = new Player();
 
 const platforms = [
-  new Platform(0, 80, 500, 80),
+  //new Platform(0, 80, 500, 80),
   new Platform(700, 200, 75, 20),
   new Platform(1000, 350, 75, 20),
-  new Platform(1100, 80, 250, 80),
+  //new Platform(1100, 80, 250, 80),
   new Platform(1275, 250, 75, 20),
-  new Platform(1350, 400, 300, 400)
+  //new Platform(1350, 400, 300, 400),
 ];
 const groundPlatforms = [];
 
-const deathboxes = [new deathBox(500, 40, 600, 40)];
+const deathboxes = [new deathBox(500, 30, 60000, 40)];
 const newWin = new WinCondition(505, 60, 60, 40);
 
 const keys = {
@@ -445,7 +445,7 @@ window.addEventListener("keyup", ({ key }) => {
 function renderGround(num) {
   let count = 0;
   for (let i = 0; i < num; i++) {
-    platforms.push(new Platform(count, 35, ground));
+    platforms.push(new imgPlatform(count, 35, ground));
     count += 200;
   }
 }
