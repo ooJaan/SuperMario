@@ -207,8 +207,8 @@ const platforms = [
   new Platform(2850, 80, 200, 80),
   new Platform(3200, 250, 300, 20),
   new Platform(3700, 500, 300, 20),
-  new Platform(4400, 500, 75, 20),
-  new Platform(5100, 300, 75, 20),
+  new Platform(4300, 500, 75, 20),
+  new Platform(4900, 300, 75, 20),
 
 
 
@@ -219,10 +219,10 @@ const groundPlatforms = [];
 const deathboxes = [
   new deathBox(500, 36, 2350, 36),
   new deathBox(1650, 36, 1200, 36),
-  new deathBox(3050, 36, 1200, 36),
+  new deathBox(3050, 36, 2550, 36),
 
 ];
-const newWin = new WinCondition(5800, 60, 1500, 40);
+const newWin = new WinCondition(5600, 60, 1500, 40);
 
 const keys = {
   right: {
@@ -239,8 +239,11 @@ function getCurTimeDifference(end, start) {
 }
 
 function setCookie(score) {
+  var exdate=new Date();
+  exdate.setDate(exdate.getDate() + 100);
+
   //set a cookie
-  document.cookie = "score=" + score;
+  document.cookie = "score=" + score + " ;expires=" + exdate.toUTCString();
   //get a cookie
   const cookieValue = document.cookie
   console.log(cookieValue)
@@ -486,6 +489,8 @@ function closePopup() {
 
 function restartGame() {
   gameover = false;
+  location.reload();
+  /*
   player.position.x = 0;
   player.position.y = 0;
   player.velocity.x = 0;
@@ -494,5 +499,6 @@ function restartGame() {
   scrollOffset = 0;
 
   animate();
+  */
 
 }
