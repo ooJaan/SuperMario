@@ -161,17 +161,6 @@ class WinCondition {
     this.width = width;
     this.height = height;
   }
-}
-
-class WinCondition {
-  constructor(x, y, width, height) {
-    this.position = {
-      x: x,
-      y: canvas.height - y,
-    };
-    this.width = width;
-    this.height = height;
-  }
 
   draw() {
     context.fillStyle = "green";
