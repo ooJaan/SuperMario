@@ -1,14 +1,51 @@
 const canvas = document.querySelector("canvas");
 const context = canvas.getContext("2d");
-const popup = document.getElementById('popup');
+const popup = document.getElementById("popup");
 var gameover = false;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-var rightSideCollision = false;
-var leftSideCollision = false;
 let scrollOffset = 0;
 
 const gravity = 0.7;
+
+/////////////////////images////////////////////////
+function createImage(imageSrc) {
+  const image = new Image();
+  image.src = imageSrc;
+  return image;
+}
+
+const ground = document.createElement("img");
+ground.src = "img/desert_ground.png";
+
+const background = document.createElement("img");
+background.src = "img/background.jpg";
+
+//////////////////character sprites////////////////////
+const runRight = document.createElement("img");
+runRight.src = "img/RunRight.png";
+const jumpRight = document.createElement("img");
+jumpRight.src = "img/JumpRight.png";
+
+const jumpLeft = document.createElement("img");
+jumpLeft.src = "img/JumpLeft.png";
+const runLeft = document.createElement("img");
+runLeft.src = "img/RunLeft.png";
+
+class GenericObject {
+  constructor(x, y, width, height, image) {
+    this.position = {
+      x: -1,
+      y: -1,
+    };
+    this.width = width;
+    this.height = height;
+    this.image = image;
+  }
+}
+
+const genericObjects = [new GenericObject(0, 0, 0, 0, background)];
+///////////////////////////////////////////////////
 
 class Player {
   constructor() {
@@ -20,16 +57,28 @@ class Player {
       x: 0,
       y: 0,
     };
-    this.width = 30;
-    this.height = 30;
+    this.width = 50;
+    this.height = 100;
+
+    this.image = createImage("img/RunRight.png");
   }
 
   draw() {
     if(!gameover){
-    context.fillStyle = "red";
-    context.fillRect(this.position.x, this.position.y, this.width, this.height);
-    }
+      context.drawImage(
+        this.image,
+        0,
+        0,
+        70,
+        400,
+        this.position.x,
+        this.position.y,
+        100,
+        400
+    );
   }
+}
+
 
   update() {
     this.draw();
@@ -45,18 +94,24 @@ class Player {
 
 /////////////////////////PLATFORM//////////////////////////
 class Platform {
-  constructor(x, y, width, height) {
+  constructor(x, y, image) {
     this.position = {
       x: x,
       y: canvas.height - y,
     };
-    this.width = width;
-    this.height = height;
+    this.image = image;
+    this.width = 200; 
+    this.height = 0; 
+
+    // Add onload event to set the dimensions once the image is loaded
+    this.image.onload = () => {
+      this.width = this.image.width;
+      this.height = this.image.height;
+    };
   }
 
   draw() {
-    context.fillStyle = "blue";
-    context.fillRect(this.position.x, this.position.y, this.width, this.height);
+    context.drawImage(this.image, this.position.x, this.position.y);
   }
 }
 class deathBox {
@@ -92,14 +147,10 @@ class deathBox {
   }
 
 const player = new Player();
-const platforms = [
-  new Platform(0, 80, 500, 80),
-  new Platform(700, 200, 75, 20),
-  new Platform(1000, 350, 75, 20),
-  new Platform(1100, 80, 250, 80),
-  new Platform(1275, 250, 75, 20),
-  new Platform(1350, 400, 300, 400)
-]
+
+const platforms = [];
+const groundPlatforms = [];
+
 const deathboxes = [
   new deathBox(500, 40, 600, 40)
 
@@ -120,51 +171,56 @@ function getCurTimeDifference(end, start){
     return time;
 }
 
-function setCookie(score, outcome) {
-    const date = new Date() + 1;
-    document.cookie = `score=${score}; outcome=${outcome}; expires=${date}`;
-    //alert(document.cookie)
-    console.log(document.cookie)
-  }
-  
-
+function setCookie(score){
+    var date = new Date();
+    var score = score;
+    document.cookie = date + "/" + score
+}
 
 const leaderboard = [1, 2, 3]
+
 function animate() {
   const timestart = new Date().getTime();
   requestAnimationFrame(animate);
   context.clearRect(0, 0, canvas.width, canvas.height);
+  genericObjects.forEach((object) => {
+    context.drawImage(object.image, 0, 0);
+  });
   player.update();
-  if (keys.right.pressed && player.position.x < 400 && !rightSideCollision) {
-    player.velocity.x = 4;
+
+  platforms.forEach((platform) => {
+    platform.draw();
+  });
+
+  if (keys.right.pressed && player.position.x < 400) {
+    player.velocity.x = 5;
   }
-  else if (keys.left.pressed && player.position.x > 100 && !leftSideCollision) {
-    player.velocity.x = -4;
+  else if (keys.left.pressed && player.position.x > 100) {
+    player.velocity.x = -5;
   }
   else {
     player.velocity.x = 0;
   }
-  if (keys.right.pressed && !rightSideCollision) {
-    scrollOffset += 4;
+  
+  if (keys.right.pressed) {
+    scrollOffset += 5;
     platforms.forEach((platform) => {
-      platform.position.x -= 4;
+      platform.position.x -= 5;
     });
     deathboxes.forEach((deathbox) =>{
-      deathbox.position.x -= 4;
+      deathbox.position.x -= 5;
     });
-  } else if (keys.left.pressed && !leftSideCollision) {
-    scrollOffset -= 4;
+  } else if (keys.left.pressed) {
+    scrollOffset -= 5;
     platforms.forEach((platform) => {
-      platform.position.x += 4;
+      platform.position.x += 5;
     });
     deathboxes.forEach((deathbox) =>{
-      deathbox.position.x += 4;
+      deathbox.position.x += 5;
     })
-    
-    newWin.position.x -= 5;
-      
   }
-  //detect platform collision
+
+  // Detect platform collision
   newWin.draw();
   
     if (
@@ -175,46 +231,36 @@ function animate() {
       player.position.x <= newWin.position.x + newWin.width
     ) {
       player.velocity.y = 0;
-      
-      const playerScore = 1000000;
-        const outcome = "win";
-        //setCookie(playerScore, outcome);
-      //location.reload()
-      alert("You win! Your score: " + playerScore)
-     // setCookie(test, score)
+      location.reload()
+      const score = 100000;
+      //setCookie(score)
+
+      alert("You win! Your score: " + score)
 
     }
+
   platforms.forEach((platform) => {
     platform.draw();
     if (
-      player.position.y + player.height <= platform.position.y &&
-      player.position.y + player.height + player.velocity.y >= platform.position.y &&
+      player.position.y + player.height + player.velocity.y >=
+        platform.position.y &&
+      player.position.y + player.velocity.y <=
+        platform.position.y + platform.height &&
       player.position.x + player.width >= platform.position.x &&
-      player.position.x <= platform.position.x + platform.width
+      player.position.x <= platform.position.x + platform.width &&
+      player.velocity.y > 0
     ) {
       player.velocity.y = 0;
+      player.position.y = platform.position.y - player.height; // Reset player position to be on top of the platform
     }
 
-// Horizontal Collision Check  
-    if (
-      player.position.y + player.height >= platform.position.y &&     
-      player.position.y <= platform.position.y + platform.height
-    ){
-      if(player.position.x + player.width >= platform.position.x && player.position.x + player.width <= platform.position.x + player.velocity.x){
-        console.log("right side collision");
-        rightSideCollision = true;
-      }
-      else{
-        rightSideCollision = false;
-      }
-      if(player.position.x <= platform.position.x + platform.width && player.position.x >= platform.position.x + platform.width + player.velocity.x){
-        console.log("left side collision");
-        leftSideCollision = true;
-      }
-      else{
-        leftSideCollision = false
-      }
+  if (player.velocity.y === 0) {
+    if (player.image === jumpRight) {
+      player.image = runRight;
+    } else if (player.image === jumpLeft) {
+      player.image = runLeft;
     }
+  }
   })
   deathboxes.forEach((deathbox) => {
     deathbox.draw();
@@ -240,6 +286,7 @@ function animate() {
     }
   })
 }
+renderGround(20);
 animate();
 
 function gameOverNow(){
@@ -259,11 +306,17 @@ window.addEventListener("keydown", ({ key }) => {
     // W - JUMP
     case "w":
       console.log("jump");
+      if (player.image === runRight) {
+        player.image = jumpRight;
+      } else {
+        player.image = jumpLeft;
+      }
       player.velocity.y -= 20;
       break;
     // A - LEFT
     case "a":
       console.log("left");
+      player.image = runLeft;
       keys.left.pressed = true;
       break;
     // S - DOWN
@@ -273,6 +326,7 @@ window.addEventListener("keydown", ({ key }) => {
     // D - RIGHT
     case "d":
       console.log("right");
+      player.image = runRight;
       keys.right.pressed = true;
       break;
   }
@@ -304,6 +358,13 @@ window.addEventListener("keyup", ({ key }) => {
   }
 });
 
+function renderGround(num) {
+  let count = 0;
+  for (let i = 0; i < num; i++) {
+    platforms.push(new Platform(count, 1110, ground));
+    count += 200;
+  }
+}
 
 function openPopup() {
     popup.style.display = 'block';
@@ -314,5 +375,4 @@ function openPopup() {
     event.preventDefault();
     location.reload();
   }
-
 
