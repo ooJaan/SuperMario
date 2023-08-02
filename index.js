@@ -178,7 +178,7 @@ function setCookie(score){
 }
 
 const leaderboard = [1, 2, 3]
-
+//test
 function animate() {
   const timestart = new Date().getTime();
   requestAnimationFrame(animate);
