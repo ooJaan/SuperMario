@@ -59,7 +59,7 @@ class Player {
     };
     this.width = 50;
     this.height = 100;
-
+    this.isJumping = false;
     this.image = createImage("img/RunRight.png");
   }
 
@@ -79,21 +79,28 @@ class Player {
     }
   }
 
-
   update() {
     this.draw();
     this.position.x += this.velocity.x;
     this.position.y += this.velocity.y;
+
     if (this.position.y + this.height + this.velocity.y <= canvas.height) {
       this.velocity.y += gravity;
     } else {
       this.velocity.y = 0;
+      this.isJumping = false; // Set isJumping to false when the player lands
+    }
+
+    const isOnGround = this.position.y + this.height >= canvas.height;
+
+    if (!isOnGround) {
+      this.isJumping = false;
     }
   }
 }
 
 /////////////////////////PLATFORM//////////////////////////
-class Platform {
+class imgPlatform {
   constructor(x, y, image) {
     this.position = {
       x: x,
@@ -112,6 +119,21 @@ class Platform {
 
   draw() {
     context.drawImage(this.image, this.position.x, this.position.y);
+  }
+}
+class Platform {
+  constructor(x, y, width, height) {
+    this.position = {
+      x: x,
+      y: canvas.height - y,
+    };
+    this.width = width;
+    this.height = height;
+  }
+
+  draw() {
+    context.fillStyle = "blue";
+    context.fillRect(this.position.x, this.position.y, this.width, this.height);
   }
 }
 class deathBox {
@@ -139,6 +161,17 @@ class WinCondition {
     this.width = width;
     this.height = height;
   }
+}
+
+class WinCondition {
+  constructor(x, y, width, height) {
+    this.position = {
+      x: x,
+      y: canvas.height - y,
+    };
+    this.width = width;
+    this.height = height;
+  }
 
   draw() {
     context.fillStyle = "green";
@@ -148,14 +181,18 @@ class WinCondition {
 
 const player = new Player();
 
-const platforms = [];
+const platforms = [
+  new Platform(0, 80, 500, 80),
+  new Platform(700, 200, 75, 20),
+  new Platform(1000, 350, 75, 20),
+  new Platform(1100, 80, 250, 80),
+  new Platform(1275, 250, 75, 20),
+  new Platform(1350, 400, 300, 400)
+];
 const groundPlatforms = [];
 
-const deathboxes = [
-  new deathBox(500, 40, 600, 40)
-
-]
-const newWin = new WinCondition(505, 60, 60, 40)
+const deathboxes = [new deathBox(500, 40, 600, 40)];
+const newWin = new WinCondition(505, 60, 60, 40);
 
 const keys = {
   right: {
@@ -195,11 +232,9 @@ function animate() {
 
   if (keys.right.pressed && player.position.x < 400) {
     player.velocity.x = 5;
-  }
-  else if (keys.left.pressed && player.position.x > 100) {
+  } else if (keys.left.pressed && player.position.x > 100) {
     player.velocity.x = -5;
-  }
-  else {
+  } else {
     player.velocity.x = 0;
   }
 
@@ -289,7 +324,7 @@ function animate() {
       //openPopup();
 
     }
-  })
+  });
 }
 renderGround(20);
 animate();
@@ -314,17 +349,20 @@ function getScore() {
 
 window.addEventListener("keydown", ({ key }) => {
   const lowercaseKey = key.toLowerCase();
-
   switch (lowercaseKey) {
     // W - JUMP
     case "w":
-      console.log("jump");
-      if (player.image === runRight) {
-        player.image = jumpRight;
-      } else {
-        player.image = jumpLeft;
+      // Only allow jumping if the player is on the ground
+      if (!player.isJumping && player.velocity.y === 0) {
+        console.log("jump");
+        player.isJumping = true;
+        if (player.image === runRight) {
+          player.image = jumpRight;
+        } else {
+          player.image = jumpLeft;
+        }
+        player.velocity.y -= 20;
       }
-      player.velocity.y -= 20;
       break;
     // A - LEFT
     case "a":
