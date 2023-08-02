@@ -59,12 +59,12 @@ class Player {
     };
     this.width = 50;
     this.height = 100;
-
+    this.isJumping = false;
     this.image = createImage("img/RunRight.png");
   }
 
   draw() {
-    if(!gameover){
+    if (!gameover) {
       context.drawImage(
         this.image,
         0,
@@ -75,19 +75,26 @@ class Player {
         this.position.y,
         100,
         400
-    );
+      );
+    }
   }
-}
-
 
   update() {
     this.draw();
     this.position.x += this.velocity.x;
     this.position.y += this.velocity.y;
+
     if (this.position.y + this.height + this.velocity.y <= canvas.height) {
       this.velocity.y += gravity;
     } else {
       this.velocity.y = 0;
+      this.isJumping = false; // Set isJumping to false when the player lands
+    }
+
+    const isOnGround = this.position.y + this.height >= canvas.height;
+
+    if (!isOnGround) {
+      this.isJumping = false;
     }
   }
 }
@@ -100,8 +107,8 @@ class Platform {
       y: canvas.height - y,
     };
     this.image = image;
-    this.width = 200; 
-    this.height = 0; 
+    this.width = 200;
+    this.height = 0;
 
     // Add onload event to set the dimensions once the image is loaded
     this.image.onload = () => {
@@ -115,47 +122,44 @@ class Platform {
   }
 }
 class deathBox {
-    constructor(x, y, width, height) {
-      this.position = {
-        x: x,
-        y: canvas.height - y,
-      };
-      this.width = width;
-      this.height = height;
-    }
-  
-    draw() {
-      context.fillStyle = "red";
-      context.fillRect(this.position.x, this.position.y, this.width, this.height);
-    }
+  constructor(x, y, width, height) {
+    this.position = {
+      x: x,
+      y: canvas.height - y,
+    };
+    this.width = width;
+    this.height = height;
   }
 
-  class WinCondition {
-    constructor(x, y, width, height) {
-      this.position = {
-        x: x,
-        y: canvas.height - y,
-      };
-      this.width = width;
-      this.height = height;
-    }
-  
-    draw() {
-      context.fillStyle = "green";
-      context.fillRect(this.position.x, this.position.y, this.width, this.height);
-    }
+  draw() {
+    context.fillStyle = "red";
+    context.fillRect(this.position.x, this.position.y, this.width, this.height);
   }
+}
+
+class WinCondition {
+  constructor(x, y, width, height) {
+    this.position = {
+      x: x,
+      y: canvas.height - y,
+    };
+    this.width = width;
+    this.height = height;
+  }
+
+  draw() {
+    context.fillStyle = "green";
+    context.fillRect(this.position.x, this.position.y, this.width, this.height);
+  }
+}
 
 const player = new Player();
 
 const platforms = [];
 const groundPlatforms = [];
 
-const deathboxes = [
-  new deathBox(500, 40, 600, 40)
-
-]
-const newWin = new WinCondition(505, 60, 60, 40)
+const deathboxes = [new deathBox(500, 40, 600, 40)];
+const newWin = new WinCondition(505, 60, 60, 40);
 
 const keys = {
   right: {
@@ -166,18 +170,18 @@ const keys = {
   },
 };
 
-function getCurTimeDifference(end, start){
-    const time = start.getTime() - end.getTime()
-    return time;
+function getCurTimeDifference(end, start) {
+  const time = start.getTime() - end.getTime();
+  return time;
 }
 
-function setCookie(score){
-    var date = new Date();
-    var score = score;
-    document.cookie = date + "/" + score
+function setCookie(score) {
+  var date = new Date();
+  var score = score;
+  document.cookie = date + "/" + score;
 }
 
-const leaderboard = [1, 2, 3]
+const leaderboard = [1, 2, 3];
 
 function animate() {
   const timestart = new Date().getTime();
@@ -194,20 +198,18 @@ function animate() {
 
   if (keys.right.pressed && player.position.x < 400) {
     player.velocity.x = 5;
-  }
-  else if (keys.left.pressed && player.position.x > 100) {
+  } else if (keys.left.pressed && player.position.x > 100) {
     player.velocity.x = -5;
-  }
-  else {
+  } else {
     player.velocity.x = 0;
   }
-  
+
   if (keys.right.pressed) {
     scrollOffset += 5;
     platforms.forEach((platform) => {
       platform.position.x -= 5;
     });
-    deathboxes.forEach((deathbox) =>{
+    deathboxes.forEach((deathbox) => {
       deathbox.position.x -= 5;
     });
   } else if (keys.left.pressed) {
@@ -215,29 +217,28 @@ function animate() {
     platforms.forEach((platform) => {
       platform.position.x += 5;
     });
-    deathboxes.forEach((deathbox) =>{
+    deathboxes.forEach((deathbox) => {
       deathbox.position.x += 5;
-    })
+    });
   }
 
   // Detect platform collision
   newWin.draw();
-  
-    if (
-      player.position.y + player.height <= newWin.position.y &&
-      player.position.y + player.height + player.velocity.y >=
-        newWin.position.y &&
-      player.position.x + player.width >= newWin.position.x &&
-      player.position.x <= newWin.position.x + newWin.width
-    ) {
-      player.velocity.y = 0;
-      location.reload()
-      const score = 100000;
-      //setCookie(score)
 
-      alert("You win! Your score: " + score)
+  if (
+    player.position.y + player.height <= newWin.position.y &&
+    player.position.y + player.height + player.velocity.y >=
+      newWin.position.y &&
+    player.position.x + player.width >= newWin.position.x &&
+    player.position.x <= newWin.position.x + newWin.width
+  ) {
+    player.velocity.y = 0;
+    location.reload();
+    const score = 100000;
+    //setCookie(score)
 
-    }
+    alert("You win! Your score: " + score);
+  }
 
   platforms.forEach((platform) => {
     platform.draw();
@@ -254,14 +255,14 @@ function animate() {
       player.position.y = platform.position.y - player.height; // Reset player position to be on top of the platform
     }
 
-  if (player.velocity.y === 0) {
-    if (player.image === jumpRight) {
-      player.image = runRight;
-    } else if (player.image === jumpLeft) {
-      player.image = runLeft;
+    if (player.velocity.y === 0) {
+      if (player.image === jumpRight) {
+        player.image = runRight;
+      } else if (player.image === jumpLeft) {
+        player.image = runLeft;
+      }
     }
-  }
-  })
+  });
   deathboxes.forEach((deathbox) => {
     deathbox.draw();
     if (
@@ -273,45 +274,47 @@ function animate() {
     ) {
       player.velocity.y = 0;
       //location.reload()
-      const score = player.position.x / 2
+      const score = player.position.x / 2;
       const endtime = new Date().getTime();
       const TimeAlive = endtime - timestart;
-      location.reload()
-      
-      alert("time Alive: " + TimeAlive +" Your Score: " + score)
+      location.reload();
+
+      alert("time Alive: " + TimeAlive + " Your Score: " + score);
       gameOverNow();
       //alert("Your Score: " + score);
       //openPopup();
-      
     }
-  })
+  });
 }
 renderGround(20);
 animate();
 
-function gameOverNow(){
-    gameover = true;
+function gameOverNow() {
+  gameover = true;
 }
-function displayScore(){
-    const scoreElement = document.getElementById("score");
-    
-    score.textContent = `Constant Value: ${scoreElement}`;
+function displayScore() {
+  const scoreElement = document.getElementById("score");
+
+  score.textContent = `Constant Value: ${scoreElement}`;
 }
 displayScore();
 
 window.addEventListener("keydown", ({ key }) => {
   const lowercaseKey = key.toLowerCase();
-
   switch (lowercaseKey) {
     // W - JUMP
     case "w":
-      console.log("jump");
-      if (player.image === runRight) {
-        player.image = jumpRight;
-      } else {
-        player.image = jumpLeft;
+      // Only allow jumping if the player is on the ground
+      if (!player.isJumping && player.velocity.y === 0) {
+        console.log("jump");
+        player.isJumping = true;
+        if (player.image === runRight) {
+          player.image = jumpRight;
+        } else {
+          player.image = jumpLeft;
+        }
+        player.velocity.y -= 20;
       }
-      player.velocity.y -= 20;
       break;
     // A - LEFT
     case "a":
@@ -367,12 +370,11 @@ function renderGround(num) {
 }
 
 function openPopup() {
-    popup.style.display = 'block';
-  }
-  
-  function closePopup() {
-    popup.style.display = 'none';
-    event.preventDefault();
-    location.reload();
-  }
+  popup.style.display = "block";
+}
 
+function closePopup() {
+  popup.style.display = "none";
+  event.preventDefault();
+  location.reload();
+}
