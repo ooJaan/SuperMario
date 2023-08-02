@@ -100,7 +100,7 @@ class Player {
 }
 
 /////////////////////////PLATFORM//////////////////////////
-class Platform {
+class imgPlatform {
   constructor(x, y, image) {
     this.position = {
       x: x,
@@ -119,6 +119,21 @@ class Platform {
 
   draw() {
     context.drawImage(this.image, this.position.x, this.position.y);
+  }
+}
+class Platform {
+  constructor(x, y, width, height) {
+    this.position = {
+      x: x,
+      y: canvas.height - y,
+    };
+    this.width = width; 
+    this.height = height; 
+  }
+
+  draw() {
+    context.fillStyle = "blue";
+    context.fillRect(this.position.x, this.position.y, this.width, this.height);
   }
 }
 class deathBox {
@@ -155,7 +170,14 @@ class WinCondition {
 
 const player = new Player();
 
-const platforms = [];
+const platforms = [
+  new Platform(0, 80, 500, 80),
+  new Platform(700, 200, 75, 20),
+  new Platform(1000, 350, 75, 20),
+  new Platform(1100, 80, 250, 80),
+  new Platform(1275, 250, 75, 20),
+  new Platform(1350, 400, 300, 400)
+];
 const groundPlatforms = [];
 
 const deathboxes = [new deathBox(500, 40, 600, 40)];
