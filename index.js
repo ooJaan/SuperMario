@@ -238,8 +238,9 @@ function animate() {
     //location.reload()
     const score = 100000;
     //setCookie(score);
-    gameOverNow();
     alert("You win!");
+    gameOverNow();
+
 
   }
 
@@ -303,11 +304,11 @@ function gameOverNow() {
 function updateLeaderboard() {
   const score = getScore();
   const scoreElement = document.getElementById("leaderboard").innerHTML = score;
-  scoreElement.textContent = "score: " + score;
+  scoreElement.textContent = "Last Score: " + score;
 }
 
 function getScore() {
-  const score = player.position.x / 2
+  const score = player.position.x / 2;
   return score;
 }
 
