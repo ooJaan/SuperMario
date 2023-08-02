@@ -187,7 +187,6 @@ class WinCondition {
     this.width = width;
     this.height = height;
   }
-
   draw() {
     context.fillStyle = "green";
     context.fillRect(this.position.x, this.position.y, this.width, this.height);
@@ -214,6 +213,7 @@ const platforms = [
 
 
 ];
+
 const groundPlatforms = [];
 
 const deathboxes = [
@@ -239,12 +239,12 @@ function getCurTimeDifference(end, start) {
 }
 
 function setCookie(score) {
-  var date = new Date();
-  var score = score;
-  document.cookie = date + "/" + score;
+  //set a cookie
+  document.cookie = "score=" + score;
+  //get a cookie
+  const cookieValue = document.cookie
+  console.log(cookieValue)
 }
-
-const leaderboard = [1, 2, 3];
 
 function animate() {
   const timestart = new Date().getTime();
@@ -298,11 +298,11 @@ function animate() {
     player.position.x <= newWin.position.x + newWin.width
   ) {
     player.velocity.y = 0;
-    location.reload();
+    //location.reload()
     const score = 100000;
-    //setCookie(score)
-
-    alert("You win! Your score: " + score);
+    //setCookie(score);
+    alert("You win!");
+    gameOverNow();
   }
   deathboxes.forEach((deathbox) => {
     deathbox.draw();
@@ -331,9 +331,9 @@ function animate() {
     platform.draw();
     if (
       player.position.y + player.height + player.velocity.y >=
-        platform.position.y &&
+      platform.position.y &&
       player.position.y + player.velocity.y <=
-        platform.position.y + platform.height &&
+      platform.position.y + platform.height &&
       player.position.x + player.width >= platform.position.x &&
       player.position.x <= platform.position.x + platform.width &&
       player.velocity.y > 0
@@ -349,7 +349,7 @@ function animate() {
         player.image = runLeft;
       }
     }
-  });
+  })
 
   /////ENEMENIES/////////////////////////////////
   if (Math.random() < 0.01) {
@@ -383,20 +383,27 @@ function animate() {
   });
 
   ///////////////////////////////////////////////
-  
 }
 renderGround(200);
 animate();
 
 function gameOverNow() {
   gameover = true;
+  updateLeaderboard();
+  alert("Game Over");
+  restartGame();
 }
-function displayScore() {
-  const scoreElement = document.getElementById("score");
 
-  score.textContent = `Constant Value: ${scoreElement}`;
+function updateLeaderboard() {
+  const score = getScore();
+  const scoreElement = document.getElementById("leaderboard").innerHTML = score;
+  scoreElement.textContent = "Last Score: " + score;
 }
-displayScore();
+
+function getScore() {
+  const score = player.position.x / 2;
+  return score;
+}
 
 window.addEventListener("keydown", ({ key }) => {
   const lowercaseKey = key.toLowerCase();
@@ -469,11 +476,23 @@ function renderGround(num) {
 }
 
 function openPopup() {
-  popup.style.display = "block";
+  popup.style.display = 'block';
 }
 
 function closePopup() {
-  popup.style.display = "none";
-  event.preventDefault();
+  popup.style.display = 'none';
   location.reload();
+}
+
+function restartGame() {
+  gameover = false;
+  player.position.x = 0;
+  player.position.y = 0;
+  player.velocity.x = 0;
+  player.velocity.y = 0;
+  player.image = runRight;
+  scrollOffset = 0;
+
+  animate();
+
 }
