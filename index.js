@@ -31,7 +31,13 @@ const jumpLeft = document.createElement("img");
 jumpLeft.src = "img/JumpLeft.png";
 const runLeft = document.createElement("img");
 runLeft.src = "img/RunLeft.png";
-
+/////////////////Enemy sprites/////////////////////////
+const fishA = document.createElement("img");
+fishA.src = "img/FishA.png";
+const fishB = document.createElement("img");
+fishB.src = "img/FishB.png";
+const fishC = document.createElement("img");
+fishC.src = "img/FishC.png";
 class GenericObject {
   constructor(x, y, width, height, image) {
     this.position = {
@@ -104,24 +110,45 @@ class Enemy {
   constructor() {
     this.position = {
       x: canvas.width,
-      y: Math.random() * (canvas.height - 200), // Random height for the enemy
+      y: Math.random() * (canvas.height - 100), // Random height for the enemy
     };
     this.velocity = {
       x: Math.random() * -5 - 2, // Random horizontal velocity between -2 and -7
       y: 0, // No vertical velocity
     };
-    this.width = 50;
-    this.height = 50;
+    this.width = 35;
+    this.height = 35;
+    this.image = getRandomEnemyImage();
   }
 
   draw() {
-    context.fillStyle = "red";
-    context.fillRect(this.position.x, this.position.y, this.width, this.height);
+    context.drawImage(
+      this.image,
+      0,
+      0,
+      450,
+      450,
+      this.position.x,
+      this.position.y,
+      50,
+      50
+    );
   }
 
   update() {
     this.position.x += this.velocity.x;
     this.position.y += this.velocity.y;
+  }
+}
+
+function getRandomEnemyImage() {
+  const random = Math.random();
+  if (random < 0.33) {
+    return createImage("img/FishA.png");
+  } else if (random < 0.66) {
+    return createImage("img/FishB.png");
+  } else {
+    return createImage("img/FishC.png");
   }
 }
 
@@ -195,19 +222,12 @@ class WinCondition {
 
 const player = new Player();
 
-const platforms = [
-  //new Platform(0, 80, 500, 80),
-  new Platform(700, 200, 75, 20),
-  new Platform(1000, 350, 75, 20),
-  //new Platform(1100, 80, 250, 80),
-  new Platform(1275, 250, 75, 20),
-  //new Platform(1350, 400, 300, 400),
-];
+const platforms = [];
 
 const groundPlatforms = [];
 
-const deathboxes = [new deathBox(500, 30, 60000, 40)];
-const newWin = new WinCondition(505, 60, 60, 40);
+const deathboxes = [new deathBox(500, 10, 60000, 10)];
+const newWin = new WinCondition(5900, 60, 60, 40);
 
 const keys = {
   right: {
@@ -227,8 +247,8 @@ function setCookie(score) {
   //set a cookie
   document.cookie = "score=" + score;
   //get a cookie
-  const cookieValue = document.cookie
-  console.log(cookieValue)
+  const cookieValue = document.cookie;
+  console.log(cookieValue);
 }
 
 function animate() {
@@ -268,7 +288,7 @@ function animate() {
     });
     deathboxes.forEach((deathbox) => {
       deathbox.position.x += 5;
-    })
+    });
     newWin.position.x += 5;
   }
 
@@ -294,9 +314,9 @@ function animate() {
     platform.draw();
     if (
       player.position.y + player.height + player.velocity.y >=
-      platform.position.y &&
+        platform.position.y &&
       player.position.y + player.velocity.y <=
-      platform.position.y + platform.height &&
+        platform.position.y + platform.height &&
       player.position.x + player.width >= platform.position.x &&
       player.position.x <= platform.position.x + platform.width &&
       player.velocity.y > 0
@@ -312,11 +332,15 @@ function animate() {
         player.image = runLeft;
       }
     }
-  })
+  });
 
-  /////ENEMENIES/////////////////////////////////
+  /////ENEMENIES & PLATFORMS/////////////////////////////////
   if (Math.random() < 0.02) {
     enemies.push(new Enemy());
+  }
+  // Spawn random ground platform
+  if (Math.random() < 0.03) {
+    createRandomGroundPlatform();
   }
 
   // Update and draw enemies
@@ -352,7 +376,7 @@ function animate() {
     if (
       player.position.y + player.height <= deathbox.position.y &&
       player.position.y + player.height + player.velocity.y >=
-      deathbox.position.y &&
+        deathbox.position.y &&
       player.position.x + player.width >= deathbox.position.x &&
       player.position.x <= deathbox.position.x + deathbox.width
     ) {
@@ -363,7 +387,7 @@ function animate() {
       const TimeAlive = endtime - timestart;
       //location.reload()
 
-      alert("time Alive: " + TimeAlive + " Your Score: " + score)
+      alert("time Alive: " + TimeAlive + " Your Score: " + score);
       gameOverNow();
       //alert("Your Score: " + score);
       //openPopup();
@@ -377,12 +401,13 @@ function gameOverNow() {
   gameover = true;
   updateLeaderboard();
   alert("Game Over");
-  restartGame();
+  setTimeout(restartGame, 10);
 }
 
 function updateLeaderboard() {
   const score = getScore();
-  const scoreElement = document.getElementById("leaderboard").innerHTML = score;
+  const scoreElement = (document.getElementById("leaderboard").innerHTML =
+    score);
   scoreElement.textContent = "Last Score: " + score;
 }
 
@@ -456,19 +481,30 @@ window.addEventListener("keyup", ({ key }) => {
 function renderGround(num) {
   let count = 0;
   for (let i = 0; i < num; i++) {
-    platforms.push(new imgPlatform(count, 35, ground));
-    count += 200;
+    // Generate a random number between 0 and 1
+    const skipProbability = Math.random();
+
+    if (skipProbability < 0.2) {
+      // Skip creating a platform for this segment (20% chance of skipping)
+      count += 200; // Increase the count to move to the next segment without creating a platform
+    } else {
+      // Create a platform for this segment
+      platforms.push(new imgPlatform(count, 35, ground));
+      count += 200; // Increase the count to move to the next segment
+    }
   }
 }
 
 function openPopup() {
-  popup.style.display = 'block';
+  popup.style.display = "block";
 }
 
 function closePopup() {
-  popup.style.display = 'none';
+  popup.style.display = "none";
   location.reload();
 }
+
+let animationFrameId = null;
 
 function restartGame() {
   gameover = false;
@@ -478,7 +514,21 @@ function restartGame() {
   player.velocity.y = 0;
   player.image = runRight;
   scrollOffset = 0;
+  // Cancel the previous animation frame request
+  if (animationFrameId !== null) {
+    cancelAnimationFrame(animationFrameId);
+  }
 
-  animate();
+  // Start a new animation loop
+  animationFrameId = requestAnimationFrame(animate);
+}
 
+function createRandomGroundPlatform() {
+  const x = canvas.width; // Start the platform outside the canvas on the right
+  const y = canvas.height - Math.random() * 2000; // Random height for the platform (adjust 200 to set the maximum height)
+  const width = Math.random() * 150 + 50; // Random width between 50 and 200
+  const height = 20; // Fixed height for ground platforms
+
+  const newPlatform = new imgPlatform(x, y, ground);
+  platforms.push(newPlatform);
 }
