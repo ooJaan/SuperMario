@@ -173,7 +173,7 @@ class deathBox {
   }
 
   draw() {
-    context.fillStyle = "transparent";
+    context.fillStyle = "red";
     context.fillRect(this.position.x, this.position.y, this.width, this.height);
   }
 }
@@ -208,15 +208,18 @@ const platforms = [
   new Platform(2450, 400, 75, 20),
   new Platform(2850, 80, 200, 80),
   new Platform(3200, 250, 300, 20),
+  new Platform(3700, 500, 300, 20),
+  new Platform(4400, 500, 75, 20),
+
 
 
 ];
 const groundPlatforms = [];
 
 const deathboxes = [
-  new deathBox(500, 40, 600, 40),
-  new deathBox(1650, 40, 1200, 40),
-  new deathBox(3050, 40, 1200, 40),
+  new deathBox(500, 36, 600, 4036),
+  new deathBox(1650, 36, 1200, 36),
+  new deathBox(3050, 36, 1200, 36),
 
 ];
 const newWin = new WinCondition(505, 60, 60, 40);
@@ -299,6 +302,28 @@ function animate() {
 
     alert("You win! Your score: " + score);
   }
+  deathboxes.forEach((deathbox) => {
+    deathbox.draw();
+    if (
+      player.position.y + player.height <= deathbox.position.y &&
+      player.position.y + player.height + player.velocity.y >=
+        deathbox.position.y &&
+      player.position.x + player.width >= deathbox.position.x &&
+      player.position.x <= deathbox.position.x + deathbox.width
+    ) {
+      player.velocity.y = 0;
+      //location.reload()
+      const score = player.position.x / 2;
+      const endtime = new Date().getTime();
+      const TimeAlive = endtime - timestart;
+      location.reload();
+
+      alert("time Alive: " + TimeAlive + " Your Score: " + score);
+      gameOverNow();
+      //alert("Your Score: " + score);
+      //openPopup();
+    }
+  });
 
   platforms.forEach((platform) => {
     platform.draw();
@@ -356,28 +381,7 @@ function animate() {
   });
 
   ///////////////////////////////////////////////
-  deathboxes.forEach((deathbox) => {
-    deathbox.draw();
-    if (
-      player.position.y + player.height <= deathbox.position.y &&
-      player.position.y + player.height + player.velocity.y >=
-        deathbox.position.y &&
-      player.position.x + player.width >= deathbox.position.x &&
-      player.position.x <= deathbox.position.x + deathbox.width
-    ) {
-      player.velocity.y = 0;
-      //location.reload()
-      const score = player.position.x / 2;
-      const endtime = new Date().getTime();
-      const TimeAlive = endtime - timestart;
-      location.reload();
-
-      alert("time Alive: " + TimeAlive + " Your Score: " + score);
-      gameOverNow();
-      //alert("Your Score: " + score);
-      //openPopup();
-    }
-  });
+  
 }
 renderGround(200);
 animate();
