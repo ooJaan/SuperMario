@@ -64,7 +64,7 @@ class Player {
   }
 
   draw() {
-    if(!gameover){
+    if (!gameover) {
       context.drawImage(
         this.image,
         0,
@@ -75,9 +75,9 @@ class Player {
         this.position.y,
         100,
         400
-    );
+      );
+    }
   }
-}
 
 
   update() {
@@ -100,8 +100,8 @@ class Platform {
       y: canvas.height - y,
     };
     this.image = image;
-    this.width = 200; 
-    this.height = 0; 
+    this.width = 200;
+    this.height = 0;
 
     // Add onload event to set the dimensions once the image is loaded
     this.image.onload = () => {
@@ -115,36 +115,36 @@ class Platform {
   }
 }
 class deathBox {
-    constructor(x, y, width, height) {
-      this.position = {
-        x: x,
-        y: canvas.height - y,
-      };
-      this.width = width;
-      this.height = height;
-    }
-  
-    draw() {
-      context.fillStyle = "red";
-      context.fillRect(this.position.x, this.position.y, this.width, this.height);
-    }
+  constructor(x, y, width, height) {
+    this.position = {
+      x: x,
+      y: canvas.height - y,
+    };
+    this.width = width;
+    this.height = height;
   }
 
-  class WinCondition {
-    constructor(x, y, width, height) {
-      this.position = {
-        x: x,
-        y: canvas.height - y,
-      };
-      this.width = width;
-      this.height = height;
-    }
-  
-    draw() {
-      context.fillStyle = "green";
-      context.fillRect(this.position.x, this.position.y, this.width, this.height);
-    }
+  draw() {
+    context.fillStyle = "red";
+    context.fillRect(this.position.x, this.position.y, this.width, this.height);
   }
+}
+
+class WinCondition {
+  constructor(x, y, width, height) {
+    this.position = {
+      x: x,
+      y: canvas.height - y,
+    };
+    this.width = width;
+    this.height = height;
+  }
+
+  draw() {
+    context.fillStyle = "green";
+    context.fillRect(this.position.x, this.position.y, this.width, this.height);
+  }
+}
 
 const player = new Player();
 
@@ -166,18 +166,19 @@ const keys = {
   },
 };
 
-function getCurTimeDifference(end, start){
-    const time = start.getTime() - end.getTime()
-    return time;
+function getCurTimeDifference(end, start) {
+  const time = start.getTime() - end.getTime()
+  return time;
 }
 
-function setCookie(score){
-    var date = new Date();
-    var score = score;
-    document.cookie = date + "/" + score
+function setCookie(score) {
+  //set a cookie
+  document.cookie = "score=" + score;
+  //get a cookie
+  const cookieValue = document.cookie
+  console.log(cookieValue)
 }
 
-const leaderboard = [1, 2, 3]
 //test
 function animate() {
   const timestart = new Date().getTime();
@@ -201,51 +202,54 @@ function animate() {
   else {
     player.velocity.x = 0;
   }
-  
+
   if (keys.right.pressed) {
     scrollOffset += 5;
     platforms.forEach((platform) => {
       platform.position.x -= 5;
     });
-    deathboxes.forEach((deathbox) =>{
+    deathboxes.forEach((deathbox) => {
       deathbox.position.x -= 5;
     });
+    newWin.position.x -= 5;
   } else if (keys.left.pressed) {
     scrollOffset -= 5;
     platforms.forEach((platform) => {
       platform.position.x += 5;
     });
-    deathboxes.forEach((deathbox) =>{
+    deathboxes.forEach((deathbox) => {
       deathbox.position.x += 5;
     })
+    newWin.position.x += 5;
+
   }
 
   // Detect platform collision
   newWin.draw();
-  
-    if (
-      player.position.y + player.height <= newWin.position.y &&
-      player.position.y + player.height + player.velocity.y >=
-        newWin.position.y &&
-      player.position.x + player.width >= newWin.position.x &&
-      player.position.x <= newWin.position.x + newWin.width
-    ) {
-      player.velocity.y = 0;
-      location.reload()
-      const score = 100000;
-      //setCookie(score)
 
-      alert("You win! Your score: " + score)
+  if (
+    player.position.y + player.height <= newWin.position.y &&
+    player.position.y + player.height + player.velocity.y >=
+    newWin.position.y &&
+    player.position.x + player.width >= newWin.position.x &&
+    player.position.x <= newWin.position.x + newWin.width
+  ) {
+    player.velocity.y = 0;
+    //location.reload()
+    const score = 100000;
+    //setCookie(score);
+    gameOverNow();
+    alert("You win!");
 
-    }
+  }
 
   platforms.forEach((platform) => {
     platform.draw();
     if (
       player.position.y + player.height + player.velocity.y >=
-        platform.position.y &&
+      platform.position.y &&
       player.position.y + player.velocity.y <=
-        platform.position.y + platform.height &&
+      platform.position.y + platform.height &&
       player.position.x + player.width >= platform.position.x &&
       player.position.x <= platform.position.x + platform.width &&
       player.velocity.y > 0
@@ -254,50 +258,58 @@ function animate() {
       player.position.y = platform.position.y - player.height; // Reset player position to be on top of the platform
     }
 
-  if (player.velocity.y === 0) {
-    if (player.image === jumpRight) {
-      player.image = runRight;
-    } else if (player.image === jumpLeft) {
-      player.image = runLeft;
+    if (player.velocity.y === 0) {
+      if (player.image === jumpRight) {
+        player.image = runRight;
+      } else if (player.image === jumpLeft) {
+        player.image = runLeft;
+      }
     }
-  }
   })
   deathboxes.forEach((deathbox) => {
     deathbox.draw();
     if (
       player.position.y + player.height <= deathbox.position.y &&
       player.position.y + player.height + player.velocity.y >=
-        deathbox.position.y &&
+      deathbox.position.y &&
       player.position.x + player.width >= deathbox.position.x &&
       player.position.x <= deathbox.position.x + deathbox.width
     ) {
       player.velocity.y = 0;
       //location.reload()
-      const score = player.position.x / 2
+      const score = getScore();
       const endtime = new Date().getTime();
       const TimeAlive = endtime - timestart;
-      location.reload()
-      
-      alert("time Alive: " + TimeAlive +" Your Score: " + score)
+      //location.reload()
+
+      alert("time Alive: " + TimeAlive + " Your Score: " + score)
       gameOverNow();
       //alert("Your Score: " + score);
       //openPopup();
-      
+
     }
   })
 }
 renderGround(20);
 animate();
 
-function gameOverNow(){
-    gameover = true;
+function gameOverNow() {
+  gameover = true;
+  updateLeaderboard();
+  alert("Game Over");
+  restartGame();
 }
-function displayScore(){
-    const scoreElement = document.getElementById("score");
-    
-    score.textContent = `Constant Value: ${scoreElement}`;
+
+function updateLeaderboard() {
+  const score = getScore();
+  const scoreElement = document.getElementById("leaderboard").innerHTML = score;
+  scoreElement.textContent = "score: " + score;
 }
-displayScore();
+
+function getScore() {
+  const score = player.position.x / 2
+  return score;
+}
 
 window.addEventListener("keydown", ({ key }) => {
   const lowercaseKey = key.toLowerCase();
@@ -367,12 +379,23 @@ function renderGround(num) {
 }
 
 function openPopup() {
-    popup.style.display = 'block';
-  }
-  
-  function closePopup() {
-    popup.style.display = 'none';
-    event.preventDefault();
-    location.reload();
-  }
+  popup.style.display = 'block';
+}
 
+function closePopup() {
+  popup.style.display = 'none';
+  location.reload();
+}
+
+function restartGame() {
+  gameover = false;
+  player.position.x = 0;
+  player.position.y = 0;
+  player.velocity.x = 0;
+  player.velocity.y = 0;
+  player.image = runRight;
+  scrollOffset = 0;
+
+  animate();
+
+}
