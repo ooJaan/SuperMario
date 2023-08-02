@@ -45,6 +45,7 @@ class GenericObject {
 }
 
 const genericObjects = [new GenericObject(0, 0, 0, 0, background)];
+const enemies = [];
 ///////////////////////////////////////////////////
 
 class Player {
@@ -96,6 +97,31 @@ class Player {
     if (!isOnGround) {
       this.isJumping = false;
     }
+  }
+}
+
+class Enemy {
+  constructor() {
+    this.position = {
+      x: canvas.width,
+      y: Math.random() * (canvas.height - 200), // Random height for the enemy
+    };
+    this.velocity = {
+      x: Math.random() * -5 - 2, // Random horizontal velocity between -2 and -7
+      y: 0, // No vertical velocity
+    };
+    this.width = 50;
+    this.height = 50;
+  }
+
+  draw() {
+    context.fillStyle = "red";
+    context.fillRect(this.position.x, this.position.y, this.width, this.height);
+  }
+
+  update() {
+    this.position.x += this.velocity.x;
+    this.position.y += this.velocity.y;
   }
 }
 
@@ -285,6 +311,39 @@ function animate() {
       }
     }
   });
+
+  /////ENEMENIES/////////////////////////////////
+  if (Math.random() < 0.02) {
+    enemies.push(new Enemy());
+  }
+
+  // Update and draw enemies
+  enemies.forEach((enemy) => {
+    enemy.update();
+    enemy.draw();
+
+    // Check for collision with player
+    if (
+      player.position.x < enemy.position.x + enemy.width &&
+      player.position.x + player.width > enemy.position.x &&
+      player.position.y < enemy.position.y + enemy.height &&
+      player.position.y + player.height > enemy.position.y
+    ) {
+      // Handle collision with enemy (e.g., game over, reduce player's health, etc.)
+      console.log("Collision with enemy!");
+      gameOverNow();
+    }
+
+    // Remove enemies that have gone off the screen
+    if (enemy.position.x + enemy.width < 0) {
+      const enemyIndex = enemies.indexOf(enemy);
+      if (enemyIndex !== -1) {
+        enemies.splice(enemyIndex, 1);
+      }
+    }
+  });
+
+  ///////////////////////////////////////////////
   deathboxes.forEach((deathbox) => {
     deathbox.draw();
     if (
@@ -308,7 +367,7 @@ function animate() {
     }
   });
 }
-renderGround(20);
+renderGround(200);
 animate();
 
 function gameOverNow() {
@@ -386,7 +445,7 @@ window.addEventListener("keyup", ({ key }) => {
 function renderGround(num) {
   let count = 0;
   for (let i = 0; i < num; i++) {
-    platforms.push(new Platform(count, 1110, ground));
+    platforms.push(new Platform(count, 35, ground));
     count += 200;
   }
 }
