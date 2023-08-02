@@ -201,8 +201,7 @@ const platforms = [
   new Platform(700, 200, 75, 20),
   new Platform(1000, 350, 75, 20),
   //new Platform(1100, 80, 250, 80),
-  new Platform(1275, 250, 75, 20),
-  new Platform(1350, 400, 300, 400),
+  new Platform(1350, 400, 300, 20),
   new Platform(1850, 150, 75, 20),
   new Platform(2250, 150, 75, 20),
   new Platform(2450, 400, 75, 20),
@@ -210,6 +209,7 @@ const platforms = [
   new Platform(3200, 250, 300, 20),
   new Platform(3700, 500, 300, 20),
   new Platform(4400, 500, 75, 20),
+  new Platform(5100, 300, 75, 20),
 
 
 
@@ -217,12 +217,12 @@ const platforms = [
 const groundPlatforms = [];
 
 const deathboxes = [
-  new deathBox(500, 36, 600, 4036),
+  new deathBox(500, 36, 2350, 36),
   new deathBox(1650, 36, 1200, 36),
   new deathBox(3050, 36, 1200, 36),
 
 ];
-const newWin = new WinCondition(505, 60, 60, 40);
+const newWin = new WinCondition(5800, 60, 1500, 40);
 
 const keys = {
   right: {
@@ -275,6 +275,7 @@ function animate() {
     deathboxes.forEach((deathbox) => {
       deathbox.position.x -= 5;
     });
+    newWin.position.x -= 5
   } else if (keys.left.pressed) {
     scrollOffset -= 5;
     platforms.forEach((platform) => {
@@ -283,6 +284,7 @@ function animate() {
     deathboxes.forEach((deathbox) => {
       deathbox.position.x += 5;
     });
+    newWin.position.x += 5
   }
 
   // Detect platform collision
@@ -350,7 +352,7 @@ function animate() {
   });
 
   /////ENEMENIES/////////////////////////////////
-  if (Math.random() < 0.02) {
+  if (Math.random() < 0.01) {
     enemies.push(new Enemy());
   }
 
