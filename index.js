@@ -64,18 +64,21 @@ class Player {
   }
 
   draw() {
-    context.drawImage(
-      this.image,
-      0,
-      0,
-      70,
-      400,
-      this.position.x,
-      this.position.y,
-      100,
-      400
+    if(!gameover){
+      context.drawImage(
+        this.image,
+        0,
+        0,
+        70,
+        400,
+        this.position.x,
+        this.position.y,
+        100,
+        400
     );
   }
+}
+
 
   update() {
     this.draw();
@@ -94,11 +97,11 @@ class Platform {
   constructor(x, y, image) {
     this.position = {
       x: x,
-      y: y,
+      y: canvas.height - y,
     };
     this.image = image;
-    this.width = 200; // Initially set to 0
-    this.height = 0; // Initially set to 0
+    this.width = 200; 
+    this.height = 0; 
 
     // Add onload event to set the dimensions once the image is loaded
     this.image.onload = () => {
@@ -111,13 +114,48 @@ class Platform {
     context.drawImage(this.image, this.position.x, this.position.y);
   }
 }
+class deathBox {
+    constructor(x, y, width, height) {
+      this.position = {
+        x: x,
+        y: canvas.height - y,
+      };
+      this.width = width;
+      this.height = height;
+    }
+  
+    draw() {
+      context.fillStyle = "red";
+      context.fillRect(this.position.x, this.position.y, this.width, this.height);
+    }
+  }
+
+  class WinCondition {
+    constructor(x, y, width, height) {
+      this.position = {
+        x: x,
+        y: canvas.height - y,
+      };
+      this.width = width;
+      this.height = height;
+    }
+  
+    draw() {
+      context.fillStyle = "green";
+      context.fillRect(this.position.x, this.position.y, this.width, this.height);
+    }
+  }
 
 const player = new Player();
-const platforms = [];
-const platform = new Platform(600, 1070, ground);
-platforms.push(platform);
 
+const platforms = [];
 const groundPlatforms = [];
+
+const deathboxes = [
+  new deathBox(500, 40, 600, 40)
+
+]
+const newWin = new WinCondition(505, 60, 60, 40)
 
 const keys = {
   right: {
@@ -128,7 +166,21 @@ const keys = {
   },
 };
 
+function getCurTimeDifference(end, start){
+    const time = start.getTime() - end.getTime()
+    return time;
+}
+
+function setCookie(score){
+    var date = new Date();
+    var score = score;
+    document.cookie = date + "/" + score
+}
+
+const leaderboard = [1, 2, 3]
+
 function animate() {
+  const timestart = new Date().getTime();
   requestAnimationFrame(animate);
   context.clearRect(0, 0, canvas.width, canvas.height);
   genericObjects.forEach((object) => {
@@ -142,29 +194,53 @@ function animate() {
 
   if (keys.right.pressed && player.position.x < 400) {
     player.velocity.x = 5;
-  } else if (keys.left.pressed && player.position.x > 100) {
+  }
+  else if (keys.left.pressed && player.position.x > 100) {
     player.velocity.x = -5;
-  } else {
+  }
+  else {
     player.velocity.x = 0;
-
-    if (keys.right.pressed) {
-      scrollOffset += 5;
-      platforms.forEach((platform) => {
-        platform.position.x -= 5;
-      });
-    } else if (keys.left.pressed) {
-      scrollOffset -= 5;
-      platforms.forEach((platform) => {
-        platform.position.x += 5;
-      });
-    }
+  }
+  
+  if (keys.right.pressed) {
+    scrollOffset += 5;
+    platforms.forEach((platform) => {
+      platform.position.x -= 5;
+    });
+    deathboxes.forEach((deathbox) =>{
+      deathbox.position.x -= 5;
+    });
+  } else if (keys.left.pressed) {
+    scrollOffset -= 5;
+    platforms.forEach((platform) => {
+      platform.position.x += 5;
+    });
+    deathboxes.forEach((deathbox) =>{
+      deathbox.position.x += 5;
+    })
   }
 
-  console.log(scrollOffset);
-
-  //detect platform collision
   // Detect platform collision
+  newWin.draw();
+  
+    if (
+      player.position.y + player.height <= newWin.position.y &&
+      player.position.y + player.height + player.velocity.y >=
+        newWin.position.y &&
+      player.position.x + player.width >= newWin.position.x &&
+      player.position.x <= newWin.position.x + newWin.width
+    ) {
+      player.velocity.y = 0;
+      location.reload()
+      const score = 100000;
+      //setCookie(score)
+
+      alert("You win! Your score: " + score)
+
+    }
+
   platforms.forEach((platform) => {
+    platform.draw();
     if (
       player.position.y + player.height + player.velocity.y >=
         platform.position.y &&
@@ -177,11 +253,7 @@ function animate() {
       player.velocity.y = 0;
       player.position.y = platform.position.y - player.height; // Reset player position to be on top of the platform
     }
-  });
 
-  if (scrollOffset > 3000) {
-    console.log("YOU WIN");
-  }
   if (player.velocity.y === 0) {
     if (player.image === jumpRight) {
       player.image = runRight;
@@ -189,9 +261,43 @@ function animate() {
       player.image = runLeft;
     }
   }
+  })
+  deathboxes.forEach((deathbox) => {
+    deathbox.draw();
+    if (
+      player.position.y + player.height <= deathbox.position.y &&
+      player.position.y + player.height + player.velocity.y >=
+        deathbox.position.y &&
+      player.position.x + player.width >= deathbox.position.x &&
+      player.position.x <= deathbox.position.x + deathbox.width
+    ) {
+      player.velocity.y = 0;
+      //location.reload()
+      const score = player.position.x / 2
+      const endtime = new Date().getTime();
+      const TimeAlive = endtime - timestart;
+      location.reload()
+      
+      alert("time Alive: " + TimeAlive +" Your Score: " + score)
+      gameOverNow();
+      //alert("Your Score: " + score);
+      //openPopup();
+      
+    }
+  })
 }
 renderGround(20);
 animate();
+
+function gameOverNow(){
+    gameover = true;
+}
+function displayScore(){
+    const scoreElement = document.getElementById("score");
+    
+    score.textContent = `Constant Value: ${scoreElement}`;
+}
+displayScore();
 
 window.addEventListener("keydown", ({ key }) => {
   const lowercaseKey = key.toLowerCase();
@@ -259,3 +365,14 @@ function renderGround(num) {
     count += 200;
   }
 }
+
+function openPopup() {
+    popup.style.display = 'block';
+  }
+  
+  function closePopup() {
+    popup.style.display = 'none';
+    event.preventDefault();
+    location.reload();
+  }
+
