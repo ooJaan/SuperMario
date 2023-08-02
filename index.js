@@ -52,7 +52,7 @@ class Player {
   constructor() {
     this.position = {
       x: 100,
-      y: 100,
+      y: canvas.height -100,
     };
     this.velocity = {
       x: 0,
@@ -202,11 +202,23 @@ const platforms = [
   new Platform(1000, 350, 75, 20),
   //new Platform(1100, 80, 250, 80),
   new Platform(1275, 250, 75, 20),
-  //new Platform(1350, 400, 300, 400),
+  new Platform(1350, 400, 300, 400),
+  new Platform(1850, 150, 75, 20),
+  new Platform(2250, 150, 75, 20),
+  new Platform(2450, 400, 75, 20),
+  new Platform(2850, 80, 200, 80),
+  new Platform(3200, 250, 300, 20),
+
+
 ];
 const groundPlatforms = [];
 
-const deathboxes = [new deathBox(500, 30, 60000, 40)];
+const deathboxes = [
+  new deathBox(500, 40, 600, 40),
+  new deathBox(1650, 40, 1200, 40),
+  new deathBox(3050, 40, 1200, 40),
+
+];
 const newWin = new WinCondition(505, 60, 60, 40);
 
 const keys = {
